@@ -51,6 +51,10 @@ else:
 def is_new_version():
     os.makedirs(doxygen_out_xml, exist_ok=True)
 
+    if os.name == 'nt':
+        # Windows does not support the command we use to detect change
+        return True
+   
     # TODO: only go it for C++ files
     version_match = False
     version_hash = subprocess.check_output(

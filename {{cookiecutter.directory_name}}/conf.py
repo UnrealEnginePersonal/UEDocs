@@ -33,28 +33,28 @@ os.makedirs(doxygen_out_html, exist_ok=True)
 
 try:
     version_tag = subprocess.check_output(
-        'git describe --tags --abbrev=0', shell=True
-    ).decode('utf-8')
+        "git describe --tags --abbrev=0", shell=True
+    ).decode("utf-8")
 except:
-    version_tag = ''
+    version_tag = ""
 
-commit = subprocess.check_output(
-    'git rev-parse --short HEAD', shell=True
-).decode('utf-8')
+commit = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode(
+    "utf-8"
+)
 
-if version_tag == '':
+if version_tag == "":
     version_identifier = commit
 else:
-    version_identifier = f'{version_tag}-{commit}'
+    version_identifier = f"{version_tag}-{commit}"
 
 
 def is_new_version():
     os.makedirs(doxygen_out_xml, exist_ok=True)
 
-    if os.name == 'nt':
+    if os.name == "nt":
         # Windows does not support the command we use to detect change
         return True
-   
+
     # TODO: only go it for C++ files
     version_match = False
     version_hash = subprocess.check_output(
@@ -94,16 +94,24 @@ def configure_doxyfile():
 def is_rtd_build():
     return os.environ.get("READTHEDOCS") is not None
 
+
 def is_github_build():
-    return  os.environ.get("GITHUB_ACTIONS") is not None
+    return os.environ.get("GITHUB_ACTIONS") is not None
+
 
 read_the_docs_build = is_rtd_build() or is_github_build()
 
 if read_the_docs_build:
-    if is_new_version():
+    doxygen_xml = os.path.join(doxygen_out_xml, "index.xml")
+
+    if is_new_version() or (not os.path.exists(doxygen_xml)):
         os.makedirs(doxygen_out_html, exist_ok=True)
         configure_doxyfile()
         subprocess.call("doxygen", shell=True)
+    else:
+        print("Not running doxygen, result already there")
+else:
+    print("Skipping doxygen")
 
 # -- General configuration ------------------------------------------------
 
@@ -175,9 +183,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"{{cookiecutter.project_name}}"
-copyright = u"{{cookiecutter.copyright}}"
-author = u"{{cookiecutter.author}}"
+project = "{{cookiecutter.project_name}}"
+copyright = "{{cookiecutter.copyright}}"
+author = "{{cookiecutter.author}}"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -193,7 +201,7 @@ release = version_tag
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -348,7 +356,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "{{cookiecutter.project_name}}.tex", u"{{cookiecutter.project_name}} Documentation", u"Pierre Delaunay", "manual"),
+    (
+        master_doc,
+        "{{cookiecutter.project_name}}.tex",
+        "{{cookiecutter.project_name}} Documentation",
+        "Pierre Delaunay",
+        "manual",
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -376,7 +390,15 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "{{cookiecutter.project_name}}", u"{{cookiecutter.project_name}} Documentation", [author], 1)]
+man_pages = [
+    (
+        master_doc,
+        "{{cookiecutter.project_name}}",
+        "{{cookiecutter.project_name}} Documentation",
+        [author],
+        1,
+    )
+]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -391,7 +413,7 @@ texinfo_documents = [
     (
         master_doc,
         "{{cookiecutter.project_name}}",
-        u"{{cookiecutter.project_name}} Documentation",
+        "{{cookiecutter.project_name}} Documentation",
         author,
         "{{cookiecutter.project_name}}",
         "Unreal Engine {{cookiecutter.project_name}}",

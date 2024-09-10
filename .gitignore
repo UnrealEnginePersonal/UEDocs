@@ -1,3 +1,6 @@
 _build/
 generated_api/
 Doxyfile
+/conf.py
+/conf.py.in
+/index.rst

@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 3.29)
+PROJECT(@IN_PROJECT_NAME@)
+
+add_subdirectory(Docs)

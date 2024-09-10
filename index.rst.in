@@ -1,0 +1,18 @@
+.. include:: Welcome/Introduction.rst
+
+.. note::
+   hello
+
+.. toctree::
+    :caption: Generated API for @IN_PROJECT_NAME@
+    :maxdepth: 30
+
+    generated_api/@IN_PROJECT_NAME@API.rst
+
+
+Indices and tables
+~~~~~~~~~~~~~~~~~~
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

@@ -1,14 +1,20 @@
-.. include:: ../README.rst
+.. include:: Welcome/Introduction.rst
 
 .. note::
-
    hello
 
 .. toctree::
-   :caption: Welcome
-   :maxdepth: 1
+    :caption: Generated API for ALSSixeBlackImplAPI
+    :maxdepth: 30
 
-   Welcome/Installation
+    generated_api/ALSSixeBlackImplAPI.rst
+
+.. toctree::
+    :caption: unabriged ORPHON
+    :maxdepth: 30
+
+    generated_api/unabridged_orphan.rst
+
 
 
 Indices and tables

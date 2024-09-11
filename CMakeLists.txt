@@ -22,14 +22,13 @@ ENDIF(DOXYGEN_FOUND)
 #       Sphinx
 # ==================================
 #   Sphinx use the information generate by doxygen to display nice documentation
-
-set(SPINX_CMD "sphinx-build -W --color -D breathe_projects.GameKit=${DOXYGEN_OUTPUT_DIR} -c ${CMAKE_SOURCE_DIR}/Docs/ -b html ${CMAKE_SOURCE_DIR}/Docs/ ${CMAKE_BINARY_DIR}/Docs/html")
+SET(SPINX_CMD "sphinx-build -W --color -D breathe_projects.GameKit=${DOXYGEN_OUTPUT_DIR} -c ${CMAKE_SOURCE_DIR}/Docs/ -b html ${CMAKE_SOURCE_DIR}/Docs/ ${CMAKE_BINARY_DIR}/Docs/html")
 MESSAGE("SPINXCOMMAND")
 MESSAGE(${SPINX_CMD})
 
 # build documentation
-ADD_CUSTOM_TARGET(sphinx ALL
-        COMMAND sphinx-build -W --color
+ADD_CUSTOM_TARGET(sphinx ALL COMMAND
+        sphinx-build -W --color
         -Dbreathe_projects.GameKit=${DOXYGEN_OUTPUT_DIR}
         -c "${CMAKE_SOURCE_DIR}/Docs/"
         -b html "${CMAKE_SOURCE_DIR}/Docs/" "${CMAKE_BINARY_DIR}/Docs/html")
@@ -44,6 +43,3 @@ ADD_DEPENDENCIES(sphinx-serve sphinx)
 # Dummy target for IDE that need files to be used in a target to display them
 FILE(GLOB_RECURSE DOC_SRC *.rst *.py *.txt Doxyfile.in)
 ADD_CUSTOM_TARGET(docs ALL SOURCES ${DOC_SRC})
-
-
-

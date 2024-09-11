@@ -7,11 +7,20 @@
 # ############################
 
 import os
+
+from .models.module_model import ModuleModel
+from .models.project_model import UProjectModel
+
 from console import console
+from typing import List
+
 
 class UEProjectUtil:
     @staticmethod
-    def get_project_data(game_root_dir: str) -> dict:
+    def get_project_data(game_root_dir: str) -> UProjectModel:
+        """
+        Get the project data from the project file.
+        """
         import json
         # check if root dir contains .uproject
         project_file = None
@@ -31,25 +40,31 @@ class UEProjectUtil:
         if project_file is None:
             raise Exception(f"No UPLUGIN or UPROJECT file found in the root directory {game_root_dir}")
 
-        console.print(f"Found project file: {project_file}")
         path = os.path.join(game_root_dir, project_file)
-        console.print(f"Path: {path}")
-
         with open(path, "r", encoding='utf-8-sig') as file:
             project_json = json.load(file)
-            friendly_name = project_json["FriendlyName"]
-            created_by = project_json["CreatedBy"]
             file.close()
 
-        return {
-            "FriendlyName": friendly_name,
-            "CreatedBy": created_by
-        }
+            author = project_json["CreatedBy"]
+            project_name = project_json["FriendlyName"]
 
-    @staticmethod
-    def get_project_name(project_data: dict) -> str:
-        return project_data["FriendlyName"]
+            modules: List[ModuleModel] = []
+            if "Modules" in project_json:
+                for module in project_json["Modules"]:
+                    module_name: str = module["Name"]
+                    module_type: str = module["Type"]
+                    modules.append(ModuleModel(
+                        module_name,
+                        module_type,
+                        author,
+                        os.path.join(game_root_dir, module_name)
+                    ))
 
-    @staticmethod
-    def get_author_name(project_data: dict) -> str:
-        return project_data["CreatedBy"]
+
+
+        return UProjectModel(
+            project_name,
+            author,
+            game_root_dir,
+            modules
+        )

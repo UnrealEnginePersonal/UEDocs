@@ -4,85 +4,89 @@ Author: Kasper de Bruin
 Created: 2024-10-09
 Version: 0.1
 """
+
 import os
-from console import console
 import shutil
+from typing import Dict
+
+from .models.project_model import UProjectModel
+
+
+def setup_file(src_filename: str, dest_filename: str, replacements: Dict[str, str]):
+    """
+    General method to copy and replace placeholders in a file.
+    """
+    shutil.copyfile(src_filename, dest_filename)
+
+    if replacements:
+        with open(dest_filename, "r") as file:
+            content = file.read()
+        for placeholder, value in replacements.items():
+            content = content.replace(placeholder, value)
+
+        with open(dest_filename, "w") as file:
+            file.write(content)
+
 
 class ProjectGenerator:
-    def __init__(self, project_name: str, author: str, copy_right: str, setup_cmake: bool, is_project: bool, is_plugin: bool):
-        self.project_name = project_name
-        self.author = author
-        self.copy_right = copy_right
-        self.setup_cmake = setup_cmake
-        self.is_project = is_project
-        self.is_plugin = is_plugin
+    """
+    Generator for the Docs project.
+    """
+    doc_template_dir = "DocFiles"
+
+    def __init__(self, project: UProjectModel):
+        """
+        Initialize the project generator.
+        """
+        self.project = project
+
+    @staticmethod
+    def get_template_dir(docs_dir: str) -> str:
+        """
+        Get the template directory.
+        """
+        return os.path.join(docs_dir, ProjectGenerator.doc_template_dir)
 
     def setup_cmake_file(self, docs_dir: str, root_dir: str):
-        console.print(f"Setting up CMakeLists.txt in: {docs_dir}")
-        #copy the CMakeLists.txt.in file to the root_dir
-        shutil.copyfile(os.path.join(docs_dir, "CMakeLists.txt.in"), os.path.join(root_dir, "CMakeLists.txt"))
-
-        with open(os.path.join(docs_dir, "CMakeLists.txt.in"), "r") as file:
-            file_data = file.read()
-            file_data = file_data.replace("@IN_PROJECT_NAME@", self.project_name)
-            file.close()
-
-        with open(os.path.join(root_dir, "CMakeLists.txt"), "w") as file:
-            file.write(file_data)
+        """
+        Set up the CMakeLists.txt file.
+        """
+        cmake_file = os.path.join(self.get_template_dir(docs_dir), "CMakeLists.txt.root.in")
+        dest_file = os.path.join(root_dir, "CMakeLists.txt")
+        setup_file(cmake_file, dest_file, {"@IN_PROJECT_NAME@": self.project.name})
 
     def setup_index_rst(self, docs_dir: str):
-        console.print(f"Setting up index.rst in: {docs_dir}")
-        #copy the index.rst.in file to the root_dir
-        shutil.copyfile(os.path.join(docs_dir, "index.rst.in"), os.path.join(docs_dir, "index.rst"))
-
-        with open(os.path.join(docs_dir, "index.rst.in"), "r") as file:
-            file_data = file.read()
-            file_data = file_data.replace("@IN_PROJECT_NAME@", self.project_name)
-            file.close()
-
-        with open(os.path.join(docs_dir, "index.rst"), "w") as file:
-            file.write(file_data)
-            file.close()
+        """
+        Set up the index.rst file.
+        """
+        index_file = os.path.join(self.get_template_dir(docs_dir), "index.rst.in")
+        dest_file = os.path.join(docs_dir, "index.rst")
+        setup_file(index_file, dest_file, {"@IN_PROJECT_NAME@": self.project.name})
 
     def setup_conf_file(self, docs_dir: str):
-        console.print(f"Setting up conf file in: {docs_dir}")
-        #copy the conf.py.in file to the root_dir
-
-        conf_file = os.path.join(docs_dir, "conf.py.in")
-        shutil.copyfile(conf_file, os.path.join(docs_dir, "conf.py"))
-
-        #open the conf.py file and replace the values
-        with open(os.path.join(docs_dir, "conf.py"), "r") as file:
-            filedata = file.read()
-            filedata = filedata.replace("@IN_PROJECT_FINAL_NAME@", self.project_name)
-            filedata = filedata.replace("@IN_PROJECT_AUTHOR@", self.author)
-            filedata = filedata.replace("@IN_PROJECT_COPYRIGHT@", self.copy_right)
-            file.close()
-
-        with open(os.path.join(docs_dir, "conf.py"), "w") as file:
-            file.write(filedata)
-            file.close()
-
+        """
+        Set up the conf.py file.
+        """
+        conf_file = os.path.join(self.get_template_dir(docs_dir), "conf.py.in")
+        dest_file = os.path.join(docs_dir, "conf.py")
+        setup_file(conf_file, dest_file, {
+            "@IN_PROJECT_FINAL_NAME@": self.project.name,
+            "@IN_PROJECT_AUTHOR@": self.project.author,
+            "@IN_PROJECT_COPYRIGHT@": self.project.author
+        })
 
     def generate_project(self, root_dir: str):
-        console.print(f"Generating project: {self.project_name}")
-        console.print(f"Author: {self.author}")
-        console.print(f"Copy right: {self.copy_right}")
-        console.print(f"Setup CMake: {self.setup_cmake}")
-        console.print(f"Is project: {self.is_project}")
-        console.print(f"Is plugin: {self.is_plugin}")
-        console.print(f"Root dir: {root_dir}")
+        """
+        Generate the project in the root dir.
+        """
         docs_dir = os.path.join(root_dir, "Docs")
-        console.print(f"Docs dir: {docs_dir}")
-
-        #setup the conf file
         self.setup_conf_file(docs_dir)
-
-        #setup the index.rst file
         self.setup_index_rst(docs_dir)
+        self.setup_introduction_rst(docs_dir)
+        self.setup_cmake_file(docs_dir, root_dir)
 
-        if self.setup_cmake:
-            self.setup_cmake_file(docs_dir, root_dir)
-
-        console.print("Project generated.")
-
+    def setup_introduction_rst(self, docs_dir: str):
+        """
+        Sets up the introduction.rst file.
+        """
+        pass
